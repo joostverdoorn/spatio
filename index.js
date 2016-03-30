@@ -1,15 +1,15 @@
-var converters = {
-  ew: function(value, context) {
+var units = {
+  ew: function(context) {
     var width = context.getBoundingClientRect().width;
-    return (value / 100) * width;
+    return width / 100;
   },
 
-  eh: function(value, context) {
+  eh: function(context) {
     var height = context.getBoundingClientRect().height;
-    return (value / 100) * height;
+    return height / 100;
   },
 
-  lh: function(value, context) {
+  lh: function(context) {
     var element = document.createElement('div');
     element.innerHTML = 'spatio';
 
@@ -19,17 +19,20 @@ var converters = {
     });
 
     context.appendChild(element);
-    var height = spatio('100eh', 'px', element);
-    return value * height;
+    return spatio('100eh', 'px', element);
+  },
+
+  ls: function(context) {
+    return spatio(2.998e10 + 'cm', 'px');
   }
 };
 
 function convert(expression, context) {
-  return Object.keys(converters).reduce(
+  return Object.keys(units).reduce(
     function(expression, key) {
       return expression.replace(
         new RegExp('([0-9]*(?:\\.[0-9]*)?)' + key, 'g'),
-        function(match, value) { return converters[key](Number(value), context) + 'px'; }
+        function(match, value) { return units[key](context) * Number(value) + 'px'; }
       )
     }, expression);
 }
@@ -38,7 +41,7 @@ function spatio(expression, unit, context) {
   if (!unit) unit = 'px';
   if (!context) context = document.body;
 
-  var element = document.createElement('div')
+  var element = document.createElement('div');
 
   Object.assign(element.style, {
     width: convert(expression, context),
