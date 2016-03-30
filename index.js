@@ -1,12 +1,26 @@
 var converters = {
   ew: function(value, context) {
     var width = context.getBoundingClientRect().width;
-    return (Number(value) / 100) * width;
+    return (value / 100) * width;
   },
 
   eh: function(value, context) {
     var height = context.getBoundingClientRect().height;
-    return (Number(value) / 100) * height;
+    return (value / 100) * height;
+  },
+
+  lh: function(value, context) {
+    var element = document.createElement('div');
+    element.innerHTML = 'spatio';
+
+    Object.assign(element.style, {
+      visibility: 'hidden',
+      position: 'fixed'
+    });
+
+    context.appendChild(element);
+    var height = spatio('100eh', 'px', element);
+    return value * height;
   }
 };
 
@@ -20,7 +34,7 @@ function convert(expression, context) {
     }, expression);
 }
 
-function measure(expression, unit, context) {
+function spatio(expression, unit, context) {
   if (!unit) unit = 'px';
   if (!context) context = document.body;
 
@@ -40,7 +54,7 @@ function measure(expression, unit, context) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = measure;
+  module.exports = spatio;
 } else {
-  self.spatio = measure;
+  self.spatio = spatio;
 }
