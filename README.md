@@ -32,4 +32,13 @@ spatio('100eh', document.body); // 940
 
 // Light seconds
 spatio('0.00001ls', 'px') // 335.53125
+
+// Add custom units
+
+// A meter beer is defined as 13 beers, so 1 beer is 100cm / 13
+spatio.addUnits({
+  beer: spatio('calc(100cm / 13)')
+});
+
+spatio('1beer', 'cm') // 7.694789081885856
 ```

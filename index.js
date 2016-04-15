@@ -1,63 +1,77 @@
-var units = {
-  ew: function(context) {
-    var width = context.getBoundingClientRect().width;
-    return width / 100;
-  },
+;(function() {
 
-  eh: function(context) {
-    var height = context.getBoundingClientRect().height;
-    return height / 100;
-  },
+  var units = {
+    ew: function(context) {
+      var width = context.getBoundingClientRect().width;
+      return width / 100;
+    },
 
-  lh: function(context) {
+    eh: function(context) {
+      var height = context.getBoundingClientRect().height;
+      return height / 100;
+    },
+
+    lh: function(context) {
+      var element = document.createElement('div');
+      element.innerHTML = 'spatio';
+
+      Object.assign(element.style, {
+        visibility: 'hidden',
+        position: 'fixed'
+      });
+
+      context.appendChild(element);
+      return spatio('100eh', 'px', element);
+    },
+
+    ls: function(context) {
+      return spatio(2.998e10 + 'cm', 'px');
+    }
+  };
+
+  function convert(expression, context) {
+    expression = Object.keys(units).reduce(
+      function(expression, key) {
+        return expression.replace(
+          new RegExp('([0-9]*(?:\\.[0-9]*)?)' + key, 'g'),
+          function(match, value) { return units[key](context) * Number(value) + 'px'; }
+        )
+      }
+    , expression);
+
     var element = document.createElement('div');
-    element.innerHTML = 'spatio';
 
     Object.assign(element.style, {
+      width: expression,
+      height: '1px',
       visibility: 'hidden',
       position: 'fixed'
     });
 
     context.appendChild(element);
-    return spatio('100eh', 'px', element);
-  },
-
-  ls: function(context) {
-    return spatio(2.998e10 + 'cm', 'px');
+    var elementRect = element.getBoundingClientRect()
+    element.remove();
+    return elementRect.width / elementRect.height;
   }
-};
 
-function convert(expression, context) {
-  return Object.keys(units).reduce(
-    function(expression, key) {
-      return expression.replace(
-        new RegExp('([0-9]*(?:\\.[0-9]*)?)' + key, 'g'),
-        function(match, value) { return units[key](context) * Number(value) + 'px'; }
-      )
-    }, expression);
-}
 
-function spatio(expression, unit, context) {
-  if (!unit) unit = 'px';
-  if (!context) context = document.body;
+  function spatio(expression, unit, context) {
+    unit = unit || 'px';
+    context = context || document.body;
 
-  var element = document.createElement('div');
+    var from = convert(expression, context);
+    var to = convert('1' + unit, context);
 
-  Object.assign(element.style, {
-    width: convert(expression, context),
-    height: 1 + unit,
-    visibility: 'hidden',
-    position: 'fixed'
-  });
+    return from / to;
+  }
 
-  context.appendChild(element);
-  var elementRect = element.getBoundingClientRect()
-  element.remove();
-  return elementRect.width / elementRect.height;
-}
+  spatio.addUnits = function(newUnits) {
+    units = Object.assign({}, units, newUnits);
+  };
 
-if (typeof module !== 'undefined') {
-  module.exports = spatio;
-} else {
-  self.spatio = spatio;
-}
+  if (typeof module !== 'undefined') {
+    module.exports = spatio;
+  } else {
+    self.spatio = spatio;
+  }
+})();
