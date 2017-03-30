@@ -3,13 +3,16 @@ Measure space!
 
 
 ## Usage
+```javascript
+spatio(expression, unit = 'px', context = document.body)
+```
 
 ```javascript
 // Measure 1em in pixels
-spatio('10pt', 'px');  // i.e. 13.328125
+spatio('10pt', 'px');  // 13.328125
 
 // Calcucate at will!
-spatio('calc(100vh - 5pt)'); // i.e. 957.328125, defaults to pixels
+spatio('calc(100vh - 5pt)'); // 957.328125, defaults to pixels
 
 // Pass context element for relative space
 var el = document.createElement('div');
